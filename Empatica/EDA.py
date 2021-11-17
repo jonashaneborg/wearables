@@ -32,7 +32,7 @@ class EDA:
         cutoff = 0.05
         norm_cutoff = cutoff/(self.sampling_rate/2)
         highpassed = self.butter_filter(lowpassed, norm_cutoff, 2, self.sampling_rate, btype='high')
-    
+
         # Downsample to 1 Hz
         downsampled = self.down_sample(highpassed, self.sampling_rate)
         n = len(downsampled)  
@@ -162,7 +162,6 @@ class EDA:
         plt.show()
 
 
-eda = EDA("Empatica/Data/EDA.csv")
-eda.detect_MOS(plotting=True)
+
 
     
