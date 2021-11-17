@@ -32,16 +32,16 @@ class EDA:
         cutoff = 0.05
         norm_cutoff = cutoff/(self.sampling_rate/2)
         highpassed = self.butter_filter(lowpassed, norm_cutoff, 2, self.sampling_rate, btype='high')
-
+    
         # Downsample to 1 Hz
         downsampled = self.down_sample(highpassed, self.sampling_rate)
         n = len(downsampled)  
         x = list(range(n))
-        
+    
         # Cubic spline 
         tck = interpolate.splrep(x, downsampled)
-        y = interpolate.splev(x, tck, der=2)
-
+        y = interpolate.splev(x, tck, der=3)
+    
         ampl_scores = self.amplitude_increase(y)
         rise_scores = self.rising_time(y)
         resp_scores = self.response_slope(y)
@@ -53,8 +53,17 @@ class EDA:
             
         return downsampled
 
+    
     def down_sample(self, list, freq):
-        # Downsample to 1 Hz
+        ''' Averaging values using a ``freq`` window size.
+
+        Parameters:
+        -----------
+        list : array_like
+            List of data to be downsampled
+        freq : int
+            The original sample rate in Hz
+        '''
         downsampled = []
         sum = 0
         for i in range(len(list)):

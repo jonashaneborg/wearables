@@ -17,12 +17,12 @@ class Reader:
 
             timestamp = int(datalist[0])
             self.sampling_rate = datalist[1]
-            self.data = datalist[2:] 
+            self.data = datalist[2:]
             self.n = len(self.data)  
 
             # Time
             self.start_time = time.datetime.fromtimestamp(timestamp)
-            self.duration = int(4*self.n/self.sampling_rate)
+            self.duration = int(self.n/self.sampling_rate)
             self.end_time = self.start_time + time.timedelta(seconds=self.duration)
 
     def getDate(self, time):
