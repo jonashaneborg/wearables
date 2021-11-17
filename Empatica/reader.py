@@ -9,6 +9,7 @@ class Reader:
     duration = 0
     n = 0
 
+
     def __init__(self, filepath):
         with open(filepath) as file:
             reader = csv.reader(file, delimiter=",")
@@ -25,8 +26,10 @@ class Reader:
             self.duration = int(self.n/self.sampling_rate)
             self.end_time = self.start_time + time.timedelta(seconds=self.duration)
 
+
     def getDate(self, time):
         return str(time.date())
+
 
     def getTime(self, time):
         return str(time.time())

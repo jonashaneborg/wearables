@@ -3,6 +3,7 @@ from scipy import interpolate
 from reader import *
 import matplotlib.pyplot as plt
 
+
 class EDA:
     reader = None
     data = []
@@ -14,6 +15,7 @@ class EDA:
 
     scores = []
 
+
     def __init__(self, filepath):
         self.reader = Reader(filepath)
         self.data = self.reader.data
@@ -21,6 +23,7 @@ class EDA:
         self.start_time = self.reader.start_time
         self.end_time = self.reader.end_time
         self.num = self.reader.n
+
 
     def detect_MOS(self, plotting=False):  
         # Butter lowpass filter
@@ -47,6 +50,9 @@ class EDA:
         resp_scores = self.response_slope(y)
 
         scores = [a + b + c for a,b,c in zip(ampl_scores, rise_scores, resp_scores)]
+
+        # Remove double MOS within 10 sec
+        scores = self.frequency_limiter(scores)
 
         if plotting:
             self.plot_data(x, y, scores)
@@ -75,6 +81,7 @@ class EDA:
 
         return downsampled
 
+
     def amplitude_increase(self, y):
         n = len(y)
         scores = [0]*n
@@ -96,6 +103,7 @@ class EDA:
 
         return scores
 
+
     def find_extrema(self, y):
         n = len(y)
         extrema = [0]*n
@@ -106,6 +114,7 @@ class EDA:
                 extrema[i] = -1
 
         return extrema
+
 
     def rising_time(self, y):
         n = len(y)
@@ -148,12 +157,30 @@ class EDA:
 
         return scores
 
+    def frequency_limiter(self, scores):
+        n = len(scores)
+        max_score = int(max(scores) * 10)
+        i = 0
+        for j in range(max_score, 5, -5):
+            j = j / 10
+            for i in range(n):
+                if scores[i] == j:
+                    pointer = i + 1
+                    while pointer - i <= 10 and pointer < n:
+                        if scores[pointer] <= j:
+                            scores[pointer] = 0
+                        pointer += 1
+
+        return scores
+
+
     def butter_filter(self, data, cutoff, order, freq, btype='low'):
         normal_cutoff = cutoff / (freq * 1)
         # Get the filter coefficients 
         b, a = butter(order, normal_cutoff, btype, analog=False)
         y = filtfilt(b, a, data)
         return y
+
 
     def plot_data(self, x, y, scores):
         plt.plot(x, y)        
